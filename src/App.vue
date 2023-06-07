@@ -1,51 +1,98 @@
 <template>
   <div id="app">
     <nav>
-      <div class="nav-wrapper blue darken-1">
-        <a href="#" class="brand-logo center">Produtos Front</a>
+      <div class="navbar navbar-dark bg-primary">
+        <a href="#" class="navbar-brand">Products</a>
       </div>
     </nav>
 
     <div class="container">
       <form>
-        <label>Nome</label>
-        <input type="text" placeholder="Nome" />
-        <label>Quantidade</label>
-        <input type="number" placeholder="QTD" />
-        <label>Valor</label>
-        <input type="text" placeholder="Valor" />
+        <div class="mb-3">
+          <label for="nome" class="form-label">Nome</label>
+          <input
+            type="text"
+            class="form-control"
+            id="nome"
+            placeholder="Nome"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="quantidade" class="form-label">Quantidade</label>
+          <input
+            type="number"
+            class="form-control"
+            id="quantidade"
+            placeholder="QTD"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="valor" class="form-label">Valor</label>
+          <input
+            type="text"
+            class="form-control"
+            id="valor"
+            placeholder="Valor"
+          />
+        </div>
 
-        <button class="waves-effect waves-light btn-small">
-          Salvar<i class="material-icons left">save</i>
+        <button class="btn btn-primary">
+          Salvar<i class="bi bi-save"></i>
         </button>
       </form>
 
-      <table>
-        <thead>
-          <tr>
-            <th>NOME</th>
-            <th>QTD</th>
-            <th>VALOR</th>
-            <th>OPÇÕES</th>
-          </tr>
-        </thead>
+      <div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>NOME</th>
+              <th>QTD</th>
+              <th>VALOR</th>
+              <th>OPÇÕES</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          <tr>
-            <td>Arduino</td>
-            <td>100</td>
-            <td>50.00</td>
-            <td>
-              <button class="waves-effect btn-small blue darken-1">
-                <i class="material-icons">create</i>
-              </button>
-              <button class="waves-effect btn-small red darken-1">
-                <i class="material-icons">delete_sweep</i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+          <tbody>
+            <tr v-for="produto in produtos" :key="produto.id">
+              <td>{{ produto.name }}</td>
+              <td>{{ produto.quantity }}</td>
+              <td>{{ produto.price }}</td>
+              <td>
+                <button class="btn btn-primary">
+                  <i class="bi bi-pencil">Editar</i>
+                </button>
+                <button class="btn btn-danger">
+                  <i class="bi bi-trash">Remover</i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
+
+<script>
+import Product from "./services/products";
+export default {
+  data() {
+    return {
+      produtos: [],
+    };
+  },
+  mounted() {
+    Product.listar().then((res) => {
+      this.produtos = res.data; // Atribui os dados à variável produtos
+    });
+  },
+};
+</script>
+
+<style>
+tr button {
+  margin: 0px 5px 0px 5px;
+}
+
+
+</style>
