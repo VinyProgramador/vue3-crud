@@ -1,48 +1,46 @@
 <template>
   <div id="app">
     <nav>
-      <div class="navbar navbar-dark bg-primary">
-        <a href="#" class="navbar-brand">Products</a>
+      <div>
+        <a href="#">Products</a>
       </div>
     </nav>
 
-    <div class="container">
-      <form>
-        <div class="mb-3">
-          <label for="nome" class="form-label">Nome</label>
+    <div>
+      <form @submit.prevent="salvar">
+        <div>
+          <label for="nome">Nome</label>
           <input
             type="text"
-            class="form-control"
             id="nome"
             placeholder="Nome"
+            v-model="product.name"
           />
         </div>
-        <div class="mb-3">
-          <label for="quantidade" class="form-label">Quantidade</label>
+        <div>
+          <label for="quantidade">Quantidade</label>
           <input
             type="number"
-            class="form-control"
             id="quantidade"
             placeholder="QTD"
+            v-model="product.quantity"
           />
         </div>
-        <div class="mb-3">
-          <label for="valor" class="form-label">Valor</label>
+        <div>
+          <label for="valor">Valor</label>
           <input
             type="text"
-            class="form-control"
             id="valor"
             placeholder="Valor"
+            v-model="product.price"
           />
         </div>
 
-        <button class="btn btn-primary">
-          Salvar<i class="bi bi-save"></i>
-        </button>
+        <button class="btn-save">Salvar</button>
       </form>
 
-      <div>
-        <table class="table">
+      <div class="product-colums">
+        <table>
           <thead>
             <tr>
               <th>NOME</th>
@@ -53,19 +51,22 @@
           </thead>
 
           <tbody>
-            <tr v-for="produto in produtos" :key="produto.id">
-              <td>{{ produto.name }}</td>
-              <td>{{ produto.quantity }}</td>
-              <td>{{ produto.price }}</td>
-              <td>
-                <button class="btn btn-primary">
-                  <i class="bi bi-pencil">Editar</i>
-                </button>
-                <button class="btn btn-danger">
-                  <i class="bi bi-trash">Remover</i>
-                </button>
-              </td>
-            </tr>
+            <template v-if="produtos.length">
+              <tr v-for="produto in produtos" :key="produto.id">
+                <td>{{ produto.name }}</td>
+                <td>{{ produto.quantity }}</td>
+                <td>{{ produto.price }}</td>
+                <td>
+                  <button class="btn-edit">Editar</button>
+                  <button class="btn-delete">Remover</button>
+                </td>
+              </tr>
+            </template>
+            <template v-else>
+              <b>
+                <h6>Não há produtos cadastrados ainda..</h6>
+              </b>
+            </template>
           </tbody>
         </table>
       </div>
@@ -78,21 +79,149 @@ import Product from "./services/products";
 export default {
   data() {
     return {
+      product: {
+        name: "",
+        quantity: "",
+        price: "",
+      },
       produtos: [],
     };
   },
   mounted() {
     Product.listar().then((res) => {
-      this.produtos = res.data; // Atribui os dados à variável produtos
+      this.produtos = res.data;
     });
+  },
+  methods: {
+    salvar() {
+      Product.salvar(this.product).then((res) => {
+        console.log(res);
+        alert("Salvo com sucesso!");
+        window.location.reload(false);
+      });
+    },
   },
 };
 </script>
 
 <style>
-tr button {
-  margin: 0px 5px 0px 5px;
+
+*{
+  font-family: monospace;
+  font-size: 1rem;
+}
+
+body {
+  font-family: monospace;
+  margin: 0;
+  padding: 0;
+}
+
+nav {
+  background-color: #0a0c10;
+  padding: 10px;
+}
+
+nav a {
+  color: #5ae982;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+form {
+  margin: 30px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: gray;
+}
+
+input {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+}
+
+.btn-edit,
+.btn-delete,
+.btn-save {
+  background-color: #2ea34f;
+  color: #f2f2f2;
+  padding: 6px 16px;
+  width: 100px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 30px;
+}
+
+.btn-edit{
+  background-color: cadetblue;
+}
+.btn-delete{
+  background-color: brown;
 }
 
 
+.product-colums {
+  overflow-x: auto;
+}
+
+.product-colums table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.product-colums th,
+.product-colums td {
+  padding: 30px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.product-colums th {
+  background-color: #f2f2f2;
+}
+
+.product-colums tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.product-colums tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+tr button{
+  margin: 15px;
+  width: 100px;
+}
+
+.btn {
+  background-color: lightgray;
+  color: black;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #5ae982;
+  color: white;
+}
+
+.btn-danger {
+  background-color: lightgray;
+  color: red;
+}
+
+h6 {
+  color: gray;
+  margin: 30px;
+}
 </style>
+
+
