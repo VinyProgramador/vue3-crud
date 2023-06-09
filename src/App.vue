@@ -21,6 +21,7 @@
           <label for="quantidade">Quantidade</label>
           <input
             type="number"
+            min="1"
             id="quantidade"
             placeholder="QTD"
             v-model="product.quantity"
@@ -55,10 +56,14 @@
               <tr v-for="produto in produtos" :key="produto.id">
                 <td>{{ produto.name }}</td>
                 <td>{{ produto.quantity }}</td>
-                <td>{{ produto.price }}</td>
+                <td>R$ {{ parseFloat(produto.price).toFixed(2) }}</td>
                 <td>
-                  <button class="btn-edit">Editar</button>
-                  <button class="btn-delete">Remover</button>
+                  <button @click="editar(produto)" class="btn-edit">
+                    Editar
+                  </button>
+                  <button @click="remover(produto.id)" class="btn-delete">
+                    Remover
+                  </button>
                 </td>
               </tr>
             </template>
@@ -80,6 +85,7 @@ export default {
   data() {
     return {
       product: {
+        id: "",
         name: "",
         quantity: "",
         price: "",
@@ -88,25 +94,56 @@ export default {
     };
   },
   mounted() {
-    Product.listar().then((res) => {
-      this.produtos = res.data;
-    });
+    this.listar();
   },
   methods: {
-    salvar() {
-      Product.salvar(this.product).then((res) => {
-        console.log(res);
-        alert("Salvo com sucesso!");
-        window.location.reload(false);
+    listar() {
+      Product.listar().then((res) => {
+        this.produtos = res.data;
       });
+    },
+    salvar() {
+      if (
+        this.product.name == "" ||
+        this.product.quantity == "" ||
+        this.product.price <= 0
+      ) {
+        return alert("Há campos vazios!");
+      } else if (!this.product.id) {
+        return Product.salvar(this.product).then((res) => {
+          console.log(res);
+          alert("Salvo com sucesso!");
+          window.location.reload(false);
+          this.listar();
+        });
+      } else {
+        return Product.atualizar(this.product.id, this.product).then((res) => {
+          console.log(res);
+          alert("Atualizado com sucesso!");
+          window.location.reload(false);
+          this.listar();
+        });
+      }
+    },
+    editar(produto) {
+      this.product = produto;
+    },
+    remover(id) {
+      Product.remover(id)
+        .then((res) => {
+          this.listar();
+          console.log(res);
+        })
+        .then((e) => {
+          console.log(e);
+        });
     },
   },
 };
 </script>
 
 <style>
-
-*{
+* {
   font-family: monospace;
   font-size: 1rem;
 }
@@ -158,13 +195,12 @@ input {
   margin-top: 30px;
 }
 
-.btn-edit{
+.btn-edit {
   background-color: cadetblue;
 }
-.btn-delete{
+.btn-delete {
   background-color: brown;
 }
-
 
 .product-colums {
   overflow-x: auto;
@@ -194,7 +230,7 @@ input {
   background-color: #f5f5f5;
 }
 
-tr button{
+tr button {
   margin: 15px;
   width: 100px;
 }
